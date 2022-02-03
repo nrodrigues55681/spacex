@@ -3,6 +3,7 @@ package com.mindera.rocketscience.di
 import android.app.Application
 import com.mindera.rocketscience.data.network.SpaceXApi
 import com.mindera.rocketscience.data.network.interceptor.ConnectivityInterceptor
+import com.mindera.rocketscience.data.repo.SpaceXRepo
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,6 +21,15 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun provideCodewarsApi(connectivityInterceptor: ConnectivityInterceptor)
+    fun provideSpaceXApi(connectivityInterceptor: ConnectivityInterceptor)
             = SpaceXApi.invoke(connectivityInterceptor)
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+class RepoModule {
+    @Singleton
+    @Provides
+    fun provideSpaceXRepo(remoteSource: SpaceXApi)
+            = SpaceXRepo(remoteSource = remoteSource)
 }
