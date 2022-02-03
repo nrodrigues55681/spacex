@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Space X</string>
+    <string name="company">Company</string>
+    <string name="launches">Launches</string>
+    <string name="company_info"> {0} was founded by {1} in {2}. It has now {3} employees, {4} launch sites, and it is valued at USD {5}</string>
+    <string name="try_again">Try Again</string>
+    <string name="something_went_wrong">"Something went wrong, please try again"</string>
 </resources>
