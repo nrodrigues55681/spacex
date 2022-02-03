@@ -3,6 +3,7 @@ package com.mindera.rocketscience.data.repo
 import com.mindera.rocketscience.data.network.SpaceXApi
 import com.mindera.rocketscience.data.toDomain
 import com.mindera.rocketscience.domain.CompanyInfo
+import com.mindera.rocketscience.domain.Launches
 import com.mindera.rocketscience.utils.Result
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -18,12 +19,26 @@ class SpaceXRepo @Inject constructor(private val remoteSource: SpaceXApi) {
             val body = response.body()
             if(body != null){
                 emit(Result.success<CompanyInfo>(body.toDomain()))
-            }
-            else {
+            } else {
                 emit(Result.error<CompanyInfo>(message = ""))
             }
         }
     }.catch {
         emit(Result.error<CompanyInfo>(message = it.message))
+    }
+
+    fun letLaunchesFlow(): Flow<Result<List<Launches>>> = flow {
+        emit(Result.loading<List<Launches>>())
+        val response = remoteSource.getAlllaunches()
+        if (response.isSuccessful) {
+            val body = response.body()
+            if(body != null){
+                emit(Result.success<List<Launches>>(body.map { it.toDomain() }))
+            } else {
+                emit(Result.error<List<Launches>>(message = ""))
+            }
+        }
+    }.catch {
+        emit(Result.error<List<Launches>>(message = it.message))
     }
 }
