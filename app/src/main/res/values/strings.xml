@@ -5,4 +5,10 @@
     <string name="company_info"> {0} was founded by {1} in {2}. It has now {3} employees, {4} launch sites, and it is valued at USD {5}</string>
     <string name="try_again">Try Again</string>
     <string name="something_went_wrong">"Something went wrong, please try again"</string>
+    <string name="mission">Mission</string>
+    <string name="datetime">Date/time</string>
+    <string name="at">at</string>
+    <string name="rocket">Rocket</string>
+    <string name="days_since">Days since now</string>
+    <string name="days_from">Days from now</string>
 </resources>

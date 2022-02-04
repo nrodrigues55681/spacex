@@ -11,7 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import com.google.accompanist.insets.ui.TopAppBar
 import com.mindera.rocketscience.R
 import com.mindera.rocketscience.ui.theme.Black
@@ -56,6 +59,7 @@ fun BarWithTitle(title: String){
         .fillMaxWidth()
         .background(Teal200)) {
         Text(text = title,
+            style = MaterialTheme.typography.button,
             color = Black,
             modifier = Modifier.padding(
                 vertical = dimensionResource(id = R.dimen.margin_2half),
@@ -107,7 +111,24 @@ fun ErrorView(
         Text(
             text = message,
             maxLines = 1,
-            color = Black
+            color = Black,
+            style = MaterialTheme.typography.caption
         )
+    }
+}
+
+@Composable
+fun Text2Style(
+    modifier: Modifier = Modifier,
+    title: String,
+    description: String) {
+    Row(modifier = modifier) {
+       Text(text = title,
+           style = MaterialTheme.typography.subtitle2,
+           color = Purple700)
+
+       Text(text = description,
+           style = MaterialTheme.typography.subtitle2,
+           color = Black)
     }
 }

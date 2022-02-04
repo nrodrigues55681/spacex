@@ -3,6 +3,7 @@ package com.mindera.rocketscience.data.network.models
 import com.google.gson.annotations.SerializedName
 
 data class LaunchesDto(
+    @SerializedName("flight_number") val flightNumber: Int,
     @SerializedName("mission_name") val missionName: String? = null,
     @SerializedName("launch_date_unix") val launchDateUnix: Long? = null,
     @SerializedName("rocket") val rocket: Rocket? = Rocket(),

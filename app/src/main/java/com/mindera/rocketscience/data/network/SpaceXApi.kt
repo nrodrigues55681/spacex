@@ -18,7 +18,7 @@ interface SpaceXApi {
     suspend fun getCompanyInfo(): Response<CompanyInfoDto>
 
     @GET("launches")
-    suspend fun getAlllaunches(): Response<List<LaunchesDto>>
+    suspend fun getAlllaunches(): List<LaunchesDto>
 
     companion object {
         operator fun invoke(
