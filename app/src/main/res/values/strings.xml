@@ -6,9 +6,13 @@
     <string name="try_again">Try Again</string>
     <string name="something_went_wrong">"Something went wrong, please try again"</string>
     <string name="mission">Mission</string>
-    <string name="datetime">Date/time</string>
+    <string name="datetime">Date</string>
     <string name="at">at</string>
     <string name="rocket">Rocket</string>
     <string name="days_since">Days since now</string>
     <string name="days_from">Days from now</string>
+    <string name="launch_success">Launch Success</string>
+    <string name="order_by">Order by:</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
 </resources>

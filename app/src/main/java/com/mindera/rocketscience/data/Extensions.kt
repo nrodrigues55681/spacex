@@ -1,11 +1,15 @@
 package com.mindera.rocketscience.data
 
+import android.annotation.SuppressLint
 import com.mindera.rocketscience.data.local.entity.CompanyInfoEntity
 import com.mindera.rocketscience.data.local.entity.LaunchesEntity
 import com.mindera.rocketscience.data.network.models.CompanyInfoDto
 import com.mindera.rocketscience.data.network.models.LaunchesDto
 import com.mindera.rocketscience.domain.CompanyInfo
 import com.mindera.rocketscience.domain.Launches
+import java.text.SimpleDateFormat
+import java.util.*
+import java.util.concurrent.TimeUnit
 
 fun CompanyInfoDto.toDomain(): CompanyInfo = CompanyInfo(
     name = name ?: "",
@@ -58,3 +62,20 @@ fun LaunchesEntity.toDomain(): Launches = Launches(
     launchDateUnix = launchDateUnix,
     launchSuccess = launchSuccess,
     missionPatchSmall = missionPatchSmall)
+
+@SuppressLint("SimpleDateFormat")
+fun Long.convertToDateAndTime(): Pair<String, String> {
+    val formatterDate = SimpleDateFormat("dd/MM/yyyy")
+    formatterDate.timeZone = TimeZone.getDefault()
+    val formatterTime = SimpleDateFormat("HH:mm")
+    formatterTime.timeZone = TimeZone.getDefault()
+    val netDate = Date(this * 1000)
+    return formatterDate.format(netDate) to formatterTime.format(netDate)
+}
+
+fun Long.daysFromSince(): Long {
+    val netDate = Date(this * 1000)
+    val actualDate = Calendar.getInstance(TimeZone.getTimeZone("UTC")).timeInMillis
+    val diff = actualDate - netDate.time
+    return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS)
+}

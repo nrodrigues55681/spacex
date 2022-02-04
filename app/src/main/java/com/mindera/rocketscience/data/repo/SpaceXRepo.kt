@@ -1,17 +1,20 @@
 package com.mindera.rocketscience.data.repo
 
 import androidx.paging.*
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.mindera.rocketscience.data.local.SpaceXDb
 import com.mindera.rocketscience.data.network.SpaceXApi
 import com.mindera.rocketscience.data.toDomain
 import com.mindera.rocketscience.data.toEntity
 import com.mindera.rocketscience.domain.CompanyInfo
+import com.mindera.rocketscience.domain.LaunchSuccessFilter
 import com.mindera.rocketscience.domain.Launches
 import com.mindera.rocketscience.domain.Sort
 import com.mindera.rocketscience.utils.DEFAULT_PAGE_SIZE
 import com.mindera.rocketscience.utils.Result
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
+
 
 class SpaceXRepo @Inject constructor(private val remoteSource: SpaceXApi, private val localSource: SpaceXDb) {
 
@@ -47,12 +50,9 @@ class SpaceXRepo @Inject constructor(private val remoteSource: SpaceXApi, privat
     }
 
     @OptIn(ExperimentalPagingApi::class)
-    fun letLaunchesFlow(sorting: Sort): Flow<PagingData<Launches>> {
+    fun letLaunchesFlow(sorting: Sort, launchSuccessFilter: LaunchSuccessFilter): Flow<PagingData<Launches>> {
         val pagingSourceFactory = {
-            when (sorting) {
-                Sort.ASC -> localSource.launchesDao().getLaunchesPagerAsc()
-                Sort.DESC -> localSource.launchesDao().getLaunchesPagerDesc()
-            }
+            localSource.launchesDao().getLaunchesPager(filterQuery(sorting = sorting, launchSuccessFilter = launchSuccessFilter))
         }
 
         return Pager(
@@ -65,5 +65,15 @@ class SpaceXRepo @Inject constructor(private val remoteSource: SpaceXApi, privat
 
     private fun getDefaultPageConfig(): PagingConfig {
         return PagingConfig(pageSize = DEFAULT_PAGE_SIZE, enablePlaceholders = false)
+    }
+
+    private fun filterQuery(sorting: Sort, launchSuccessFilter: LaunchSuccessFilter): SimpleSQLiteQuery{
+        var queryString = "SELECT * FROM launches"
+        if(launchSuccessFilter != LaunchSuccessFilter.ALL){
+            queryString = queryString.plus(" WHERE " +
+                    "launchSuccess = ${if(launchSuccessFilter == LaunchSuccessFilter.SUCCESS) 1 else 0}")
+        }
+        queryString = queryString.plus(" ORDER BY missionName ${sorting.name}")
+        return SimpleSQLiteQuery(queryString)
     }
 }

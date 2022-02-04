@@ -1,56 +1,41 @@
 package com.mindera.rocketscience.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.text.withStyle
 import com.google.accompanist.insets.ui.TopAppBar
 import com.mindera.rocketscience.R
 import com.mindera.rocketscience.ui.theme.Black
 import com.mindera.rocketscience.ui.theme.Purple700
+import com.mindera.rocketscience.ui.theme.Shapes
 import com.mindera.rocketscience.ui.theme.Teal200
 
 @Composable
 fun TopBar(
     title: String,
-    showBackButton: Boolean = false,
-    onBackButtonClick: (() -> Unit)? = null) {
+    onFilterClick: (() -> Unit)) {
 
     TopAppBar(
         title = { Text(text = title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
-        navigationIcon = ShowNavigationIcon(showBackButton, onBackButtonClick)
-    )
-}
-
-@Composable
-fun ShowNavigationIcon(showBackButton: Boolean = false,
-                       onBackButtonClick: (() -> Unit)? = null): @Composable() (() -> Unit)? {
-    return if(showBackButton) {
-        {
-            Icon(
-                imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "",
-                modifier = Modifier
-                    .padding(dimensionResource(R.dimen.margin_default))
-                    .clickable {
-                        onBackButtonClick?.let { it() }
-                    }
-            )
+        actions = {
+            IconButton(onClick = { onFilterClick() }) {
+                Icon(
+                    tint = Color.White,
+                    painter = painterResource(id = R.drawable.ic_baseline_filter_alt_24),
+                    contentDescription = null
+                )
+            }
         }
-    } else {
-        null
-    }
+    )
 }
 
 @Composable
@@ -130,5 +115,55 @@ fun Text2Style(
        Text(text = description,
            style = MaterialTheme.typography.subtitle2,
            color = Black)
+    }
+}
+
+@Composable
+fun<T> GroupRadioButton(modifier: Modifier,
+                     title: String,
+                     itemSelected: T,
+                     items: List<T>,
+                     onRadioButtonClick: ((Int) -> Unit)){
+    if(items.isNotEmpty()){
+        Column(modifier = modifier) {
+            Text(text = title, color = Purple700, style = MaterialTheme.typography.body1)
+            Row(modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically) {
+                items.forEachIndexed { index, element ->
+                    RadioButton(selected = itemSelected == element,
+                        onClick = { onRadioButtonClick(index) })
+                    Text(text = element.toString(),
+                        style = MaterialTheme.typography.caption,
+                        color = Black)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun OkCancelButton(modifier: Modifier,
+                   okTitle: String,
+                   cancelTitle: String,
+                   onOkClick: (() -> Unit),
+                   onCancelClick: (() -> Unit)){
+    Row(modifier = modifier,
+        horizontalArrangement = Arrangement.End) {
+        Button(
+            onClick = onCancelClick,
+            shape = Shapes.large,
+            colors = ButtonDefaults.buttonColors(backgroundColor = Purple700),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .clip(RoundedCornerShape(dimensionResource(id = R.dimen.margin_2half)))
+        ) { Text(text = cancelTitle, color = Color.White) }
+        Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.margin_half)))
+        Button(
+            onClick = onOkClick,
+            shape = Shapes.large,
+            colors = ButtonDefaults.buttonColors(backgroundColor = Purple700),
+            modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(dimensionResource(id = R.dimen.margin_2half)))
+        ) { Text(text = okTitle, color = Color.White) }
     }
 }

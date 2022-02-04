@@ -29,20 +29,21 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.rememberImagePainter
 import com.mindera.rocketscience.R
+import com.mindera.rocketscience.data.convertToDateAndTime
+import com.mindera.rocketscience.data.daysFromSince
 import com.mindera.rocketscience.domain.CompanyInfo
 import com.mindera.rocketscience.domain.Launches
 import com.mindera.rocketscience.ui.components.*
 import com.mindera.rocketscience.ui.theme.Gray
 import com.mindera.rocketscience.ui.theme.Purple700
-import com.mindera.rocketscience.ui.utils.convertToDateAndTime
-import com.mindera.rocketscience.ui.utils.daysFromSince
 import com.mindera.rocketscience.utils.Result
 import java.text.MessageFormat
 
 @Composable
-fun SpaceXScreen(viewModel: SpaceXViewModel) {
+fun SpaceXScreen(viewModel: SpaceXViewModel,
+                 onShowFilterDialog: () -> Unit) {
     Scaffold(
-        topBar = { TopBar(title = stringResource(id = R.string.app_name), showBackButton = false) }
+        topBar = { TopBar(title = stringResource(id = R.string.app_name), onFilterClick = onShowFilterDialog) }
     ) {
         SpaceXContent(viewModel = viewModel)
     }
@@ -189,15 +190,7 @@ fun LaunchItem(launch: Launches){
                 description = "${launch.rocketName} / ${launch.rocketType}")
 
             val daysValue = launch.launchDateUnix.daysFromSince()
-            var daysTitle = ""
-            var daysDescription = ""
-            if(daysValue > 0) {
-                daysTitle = stringResource(id = R.string.days_since)
-                daysDescription = "-$daysValue"
-            } else {
-                daysTitle = stringResource(id = R.string.days_from)
-                daysDescription = "+$daysValue"
-            }
+            val daysTitle = if(daysValue > 0) stringResource(id = R.string.days_since) else stringResource(id = R.string.days_from)
 
             Text2Style(
                 modifier = Modifier.constrainAs(days){
@@ -208,7 +201,7 @@ fun LaunchItem(launch: Launches){
                     height = Dimension.wrapContent
                 },
                 title = "$daysTitle: ",
-                description = daysDescription)
+                description = "$daysValue")
 
             Icon(
                 modifier = Modifier.constrainAs(launchSuccess){
@@ -217,7 +210,7 @@ fun LaunchItem(launch: Launches){
                     width = Dimension.wrapContent
                     height = Dimension.wrapContent
                 },
-                imageVector = if(launch.launchSuccess) Icons.Filled.Check else Icons.Filled.Clear,
+                imageVector = if(launch.launchSuccess) Icons.Default.Check else Icons.Default.Clear,
                 contentDescription = "",
                 tint = Purple700
             )
