@@ -4,6 +4,7 @@ import android.app.Application
 import com.mindera.rocketscience.data.local.SpaceXDb
 import com.mindera.rocketscience.data.network.SpaceXApi
 import com.mindera.rocketscience.data.network.interceptor.ConnectivityInterceptor
+import com.mindera.rocketscience.data.repo.FilterDialogRepo
 import com.mindera.rocketscience.data.repo.SpaceXRepo
 import dagger.Module
 import dagger.Provides
@@ -52,4 +53,10 @@ class RepoModule {
     @Provides
     fun provideSpaceXRepo(remoteSource: SpaceXApi, localSource: SpaceXDb)
             = SpaceXRepo(remoteSource = remoteSource, localSource = localSource)
+
+    @Singleton
+    @Provides
+    fun provideFilterDialogRepo(localSource: SpaceXDb)
+            = FilterDialogRepo(localSource = localSource)
+
 }

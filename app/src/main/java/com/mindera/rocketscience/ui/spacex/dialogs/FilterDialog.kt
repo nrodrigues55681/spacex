@@ -3,6 +3,7 @@ package com.mindera.rocketscience.ui.spacex.dialogs
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,7 +17,9 @@ import androidx.compose.ui.window.Dialog
 import com.mindera.rocketscience.R
 import com.mindera.rocketscience.ui.components.GroupRadioButton
 import com.mindera.rocketscience.ui.components.OkCancelButton
+import com.mindera.rocketscience.ui.components.YearFilter
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FilterDialog(viewModel: FilterDialogViewModel,
                  onCancelClick: () -> Unit,
@@ -37,17 +40,27 @@ fun FilterDialog(viewModel: FilterDialogViewModel,
                     .background(color = Color.White, shape = RoundedCornerShape(10.dp))
             ) {
                 Column(modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_default))) {
+                    YearFilter(
+                        modifier = Modifier.fillMaxWidth(),
+                        enable = uiState.filterData.filterByDate,
+                        minYear = uiState.filterData.minYear,
+                        maxYear = uiState.filterData.maxYear,
+                        defaultMaxYear = uiState.sliderMinYear,
+                        defaultMinYear = uiState.sliderMaxYear,
+                        onEnableFilter = viewModel::onEnableYearFilter,
+                        onValueChange = viewModel::onChangeYearFilter
+                    )
 
                     GroupRadioButton(modifier = Modifier.fillMaxWidth(),
                         onRadioButtonClick = viewModel::onSortingSelected,
                         title = stringResource(id = R.string.order_by),
-                        itemSelected = uiState.sorting,
+                        itemSelected = uiState.filterData.sorting,
                         items = uiState.lstSort)
 
                     GroupRadioButton(modifier = Modifier.fillMaxWidth(),
                         onRadioButtonClick = viewModel::onLaunchSuccessFilterSelected,
                         title = stringResource(id = R.string.launch_success),
-                        itemSelected = uiState.launchSuccessFilter,
+                        itemSelected = uiState.filterData.launchSuccessFilter,
                         items = uiState.lstLaunchSuccessFilter)
 
                     OkCancelButton(modifier = Modifier.fillMaxWidth(),

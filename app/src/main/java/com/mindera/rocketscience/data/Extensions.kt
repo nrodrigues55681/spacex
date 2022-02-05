@@ -36,15 +36,6 @@ fun CompanyInfoEntity.toDomain(): CompanyInfo = CompanyInfo(
     launchSites = launchSites,
     valuation = valuation)
 
-fun LaunchesDto.toDomain(): Launches = Launches(
-    flightNumber = flightNumber,
-    missionName = missionName ?: "",
-    rocketName = rocket?.rocketName ?: "",
-    rocketType = rocket?.rocketType ?: "",
-    launchDateUnix = launchDateUnix ?: 0,
-    launchSuccess = launchSuccess ?: false,
-    missionPatchSmall = links?.missionPatchSmall ?: "")
-
 fun LaunchesDto.toEntity(): LaunchesEntity = LaunchesEntity(
     flightNumber = flightNumber,
     missionName = missionName ?: "",
@@ -52,7 +43,11 @@ fun LaunchesDto.toEntity(): LaunchesEntity = LaunchesEntity(
     rocketType = rocket?.rocketType ?: "",
     launchDateUnix = launchDateUnix ?: 0,
     launchSuccess = launchSuccess ?: false,
-    missionPatchSmall = links?.missionPatchSmall ?: "")
+    launchYear = launchYear ?: 0,
+    missionPatchSmall = links?.missionPatchSmall ?: "",
+    articleLink = links?.articleLink ?: "",
+    wikipedia = links?.wikipedia ?: "",
+    videoLink = links?.videoLink ?: "")
 
 fun LaunchesEntity.toDomain(): Launches = Launches(
     flightNumber = flightNumber,
@@ -61,7 +56,10 @@ fun LaunchesEntity.toDomain(): Launches = Launches(
     rocketType = rocketType,
     launchDateUnix = launchDateUnix,
     launchSuccess = launchSuccess,
-    missionPatchSmall = missionPatchSmall)
+    missionPatchSmall = missionPatchSmall,
+    articleLink = articleLink,
+    wikipedia = wikipedia,
+    videoLink = videoLink)
 
 @SuppressLint("SimpleDateFormat")
 fun Long.convertToDateAndTime(): Pair<String, String> {

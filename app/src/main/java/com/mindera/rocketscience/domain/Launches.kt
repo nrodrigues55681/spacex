@@ -7,4 +7,7 @@ data class Launches (
     val rocketType: String,
     val launchDateUnix: Long,
     val launchSuccess: Boolean,
-    val missionPatchSmall: String)
+    val missionPatchSmall: String,
+    val articleLink: String,
+    val wikipedia: String,
+    val videoLink: String)

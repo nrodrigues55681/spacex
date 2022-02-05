@@ -3,6 +3,7 @@ package com.mindera.rocketscience.data.local.dao
 import androidx.paging.PagingSource
 import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteQuery
+import com.mindera.rocketscience.data.local.entity.LaunchYearMaxMin
 import com.mindera.rocketscience.data.local.entity.LaunchesEntity
 import kotlinx.coroutines.flow.Flow
 
@@ -13,6 +14,9 @@ abstract class LaunchesDao  {
 
     @RawQuery(observedEntities = [LaunchesEntity::class])
     abstract fun getLaunchesPager(query: SupportSQLiteQuery): PagingSource<Int, LaunchesEntity>
+
+    @Query("SELECT MAX(launchYear) as launch_year_max, MIN(launchYear) as launch_year_min FROM launches")
+    abstract suspend fun getMaxMinLaunchYear(): LaunchYearMaxMin
 
     @Query("DELETE FROM launches")
     abstract fun clearAll()

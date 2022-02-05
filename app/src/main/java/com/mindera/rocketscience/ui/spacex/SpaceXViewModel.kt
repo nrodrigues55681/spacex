@@ -5,13 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
-import com.mindera.rocketscience.LAUNCH_SUCCESS_KEY
-import com.mindera.rocketscience.ORDER_KEY
+import com.mindera.rocketscience.*
 import com.mindera.rocketscience.data.repo.SpaceXRepo
 import com.mindera.rocketscience.domain.CompanyInfo
 import com.mindera.rocketscience.domain.LaunchSuccessFilter
 import com.mindera.rocketscience.domain.Launches
 import com.mindera.rocketscience.domain.Sort
+import com.mindera.rocketscience.ui.utils.FilterData
+import com.mindera.rocketscience.ui.utils.fromJson
 import com.mindera.rocketscience.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -20,29 +21,23 @@ import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class FilterState(
-    val sorting: Sort = Sort.ASC,
-    val launchSuccessFilter: LaunchSuccessFilter = LaunchSuccessFilter.ALL
-)
-
 @HiltViewModel
 @OptIn(ExperimentalCoroutinesApi::class)
 class SpaceXViewModel @Inject constructor(savedStateHandle: SavedStateHandle,
                                           private val repo: SpaceXRepo): ViewModel() {
 
-    private val _filterState: MutableStateFlow<FilterState> = MutableStateFlow(FilterState(
-        sorting = Sort.valueOf(savedStateHandle.get(ORDER_KEY) ?: "ASC"),
-        launchSuccessFilter = LaunchSuccessFilter.valueOf(savedStateHandle.get(LAUNCH_SUCCESS_KEY) ?: "ALL"))
-    )
-    val filterState: StateFlow<FilterState>
-        get() = _filterState
+    private val _filterData: MutableStateFlow<FilterData> = MutableStateFlow(
+        savedStateHandle.get<String>(FILTER_KEY)?.fromJson() ?: FilterData())
+
+    val filterData: StateFlow<FilterData>
+        get() = _filterData
 
     private val _companyInfo = MutableStateFlow<Result<CompanyInfo>>(Result.loading())
     val companyInfo: StateFlow<Result<CompanyInfo>>
         get() = _companyInfo
 
-    private val _lstLaunches = filterState.transformLatest {
-        state -> emitAll(repo.letLaunchesFlow(state.sorting, state.launchSuccessFilter).cachedIn(viewModelScope))
+    private val _lstLaunches = filterData.transformLatest {
+        filterData -> emitAll(repo.letLaunchesFlow(filterData).cachedIn(viewModelScope))
     }
 
     val lstLaunches: Flow<PagingData<Launches>>

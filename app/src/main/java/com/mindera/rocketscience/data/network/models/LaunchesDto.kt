@@ -8,6 +8,7 @@ data class LaunchesDto(
     @SerializedName("launch_date_unix") val launchDateUnix: Long? = null,
     @SerializedName("rocket") val rocket: Rocket? = Rocket(),
     @SerializedName("launch_success") val launchSuccess: Boolean? = null,
+    @SerializedName("launch_year") val launchYear: Int? = null,
     @SerializedName("links") val links: LaunchesLinks? = LaunchesLinks(),
 )
 
@@ -17,5 +18,8 @@ data class Rocket(
 )
 
 data class LaunchesLinks(
-    @SerializedName("mission_patch_small") val missionPatchSmall: String? = null
+    @SerializedName("mission_patch_small") val missionPatchSmall: String? = null,
+    @SerializedName("article_link") var articleLink: String? = null,
+    @SerializedName("wikipedia") var wikipedia: String? = null,
+    @SerializedName("video_link") var videoLink: String? = null,
 )

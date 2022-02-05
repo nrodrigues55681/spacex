@@ -8,27 +8,26 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.mindera.rocketscience.domain.LaunchSuccessFilter
-import com.mindera.rocketscience.domain.Sort
 import com.mindera.rocketscience.ui.spacex.SpaceXScreen
 import com.mindera.rocketscience.ui.spacex.SpaceXViewModel
 import com.mindera.rocketscience.ui.spacex.dialogs.FilterDialog
 import com.mindera.rocketscience.ui.spacex.dialogs.FilterDialogViewModel
+import com.mindera.rocketscience.ui.utils.FilterData
+import com.mindera.rocketscience.ui.utils.toJson
 
-const val ORDER_KEY = "order_by"
-const val LAUNCH_SUCCESS_KEY = "launch_success"
+const val FILTER_KEY = "filter_data"
 
 internal sealed class Screen(val route: String) {
-    object SpaceX: Screen("spacex/{${ORDER_KEY}}/{${LAUNCH_SUCCESS_KEY}}"){
-        fun createRoute(sort: Sort, launchSuccessFilter: LaunchSuccessFilter)
-                = "spacex/${sort.name}/${launchSuccessFilter.name}"
+    object SpaceX: Screen("spacex/{$FILTER_KEY}") {
+        fun createRoute(filterData: FilterData)
+                = "spacex/${filterData.toJson()}"
     }
 }
 
 internal sealed class Dialog(val route: String) {
-    object Filter: Dialog("filter/{${ORDER_KEY}}/{${LAUNCH_SUCCESS_KEY}}") {
-        fun createRoute(sort: Sort, launchSuccessFilter: LaunchSuccessFilter)
-            = "filter/${sort.name}/${launchSuccessFilter.name}"
+    object Filter: Dialog("filter/{$FILTER_KEY}") {
+        fun createRoute(filterData: FilterData)
+            = "filter/${filterData.toJson()}"
     }
 }
 
@@ -38,43 +37,29 @@ fun SpaceXNavApp() {
     NavHost(navController, startDestination = Screen.SpaceX.route) {
         composable(route = Screen.SpaceX.route,
             arguments = listOf(
-                navArgument(ORDER_KEY) {
+                navArgument(FILTER_KEY) {
                     type = NavType.StringType
-                    defaultValue = Sort.ASC.name
-                },
-                navArgument(LAUNCH_SUCCESS_KEY) {
-                    type = NavType.StringType
-                    defaultValue = LaunchSuccessFilter.ALL.name
+                    defaultValue = FilterData().toJson()
                 })
         ){
             val viewModel = hiltViewModel<SpaceXViewModel>()
             SpaceXScreen(viewModel = viewModel,
                 onShowFilterDialog = {
-                    navController.navigate(Dialog.Filter.createRoute(
-                        sort = viewModel.filterState.value.sorting,
-                        launchSuccessFilter = viewModel.filterState.value.launchSuccessFilter)
-                    )
+                    navController.navigate(Dialog.Filter.createRoute(viewModel.filterData.value))
                 })
         }
 
         dialog(route = Dialog.Filter.route,
             arguments = listOf(
-                navArgument(ORDER_KEY) {
+                navArgument(FILTER_KEY) {
                     type = NavType.StringType
-                    defaultValue = Sort.ASC.name
-                },
-                navArgument(LAUNCH_SUCCESS_KEY) {
-                    type = NavType.StringType
-                    defaultValue = LaunchSuccessFilter.ALL.name
+                    defaultValue = FilterData().toJson()
                 })
         ){
             val viewModel = hiltViewModel<FilterDialogViewModel>()
             FilterDialog(viewModel = viewModel,
                 onOkClick = {
-                    val spaceXRoute = Screen.SpaceX.createRoute(
-                        sort = viewModel.uiState.value.sorting,
-                        launchSuccessFilter = viewModel.uiState.value.launchSuccessFilter)
-
+                    val spaceXRoute = Screen.SpaceX.createRoute(viewModel.uiState.value.filterData)
                     navController.navigate(spaceXRoute){
                         popUpTo(spaceXRoute) { inclusive = true }
                     }

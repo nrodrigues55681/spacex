@@ -9,7 +9,7 @@ import com.mindera.rocketscience.data.toEntity
 import com.mindera.rocketscience.domain.CompanyInfo
 import com.mindera.rocketscience.domain.LaunchSuccessFilter
 import com.mindera.rocketscience.domain.Launches
-import com.mindera.rocketscience.domain.Sort
+import com.mindera.rocketscience.ui.utils.FilterData
 import com.mindera.rocketscience.utils.DEFAULT_PAGE_SIZE
 import com.mindera.rocketscience.utils.Result
 import kotlinx.coroutines.flow.*
@@ -50,9 +50,9 @@ class SpaceXRepo @Inject constructor(private val remoteSource: SpaceXApi, privat
     }
 
     @OptIn(ExperimentalPagingApi::class)
-    fun letLaunchesFlow(sorting: Sort, launchSuccessFilter: LaunchSuccessFilter): Flow<PagingData<Launches>> {
+    fun letLaunchesFlow(filterData: FilterData): Flow<PagingData<Launches>> {
         val pagingSourceFactory = {
-            localSource.launchesDao().getLaunchesPager(filterQuery(sorting = sorting, launchSuccessFilter = launchSuccessFilter))
+            localSource.launchesDao().getLaunchesPager(filterQuery(filterData = filterData))
         }
 
         return Pager(
@@ -67,13 +67,19 @@ class SpaceXRepo @Inject constructor(private val remoteSource: SpaceXApi, privat
         return PagingConfig(pageSize = DEFAULT_PAGE_SIZE, enablePlaceholders = false)
     }
 
-    private fun filterQuery(sorting: Sort, launchSuccessFilter: LaunchSuccessFilter): SimpleSQLiteQuery{
+    private fun filterQuery(filterData: FilterData): SimpleSQLiteQuery{
         var queryString = "SELECT * FROM launches"
-        if(launchSuccessFilter != LaunchSuccessFilter.ALL){
+        val launchSuccessFilterEnable = filterData.launchSuccessFilter != LaunchSuccessFilter.ALL
+        if(launchSuccessFilterEnable){
             queryString = queryString.plus(" WHERE " +
-                    "launchSuccess = ${if(launchSuccessFilter == LaunchSuccessFilter.SUCCESS) 1 else 0}")
+                    "launchSuccess = ${if(filterData.launchSuccessFilter == LaunchSuccessFilter.SUCCESS) 1 else 0}")
         }
-        queryString = queryString.plus(" ORDER BY missionName ${sorting.name}")
+        if(filterData.filterByDate){
+            val andOrWhere = if (launchSuccessFilterEnable) "AND" else "WHERE"
+            queryString = queryString.plus(" $andOrWhere launchYear >= ${filterData.minYear} " +
+                    "AND launchYear <= ${filterData.maxYear}")
+        }
+        queryString = queryString.plus(" ORDER BY missionName ${filterData.sorting.name}")
         return SimpleSQLiteQuery(queryString)
     }
 }

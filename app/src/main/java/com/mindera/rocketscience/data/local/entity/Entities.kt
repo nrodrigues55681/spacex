@@ -1,5 +1,6 @@
 package com.mindera.rocketscience.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -10,8 +11,17 @@ data class LaunchesEntity(
     val rocketName: String,
     val rocketType: String,
     val launchDateUnix: Long,
+    val launchYear: Int,
     val launchSuccess: Boolean,
-    val missionPatchSmall: String
+    val missionPatchSmall: String,
+    val articleLink: String,
+    val wikipedia: String,
+    val videoLink: String,
+)
+
+data class LaunchYearMaxMin(
+    @ColumnInfo(name = "launch_year_max") val launchYearMax: Int,
+    @ColumnInfo(name = "launch_year_min") val launchYearMin: Int
 )
 
 @Entity(tableName = "company_info")

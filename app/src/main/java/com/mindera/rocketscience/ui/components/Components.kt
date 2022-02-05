@@ -4,14 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.core.util.toRange
 import com.google.accompanist.insets.ui.TopAppBar
 import com.mindera.rocketscience.R
 import com.mindera.rocketscience.ui.theme.Black
@@ -163,7 +165,41 @@ fun OkCancelButton(modifier: Modifier,
             onClick = onOkClick,
             shape = Shapes.large,
             colors = ButtonDefaults.buttonColors(backgroundColor = Purple700),
-            modifier = Modifier.fillMaxWidth().weight(1f).clip(RoundedCornerShape(dimensionResource(id = R.dimen.margin_2half)))
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+                .clip(RoundedCornerShape(dimensionResource(id = R.dimen.margin_2half)))
         ) { Text(text = okTitle, color = Color.White) }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun YearFilter(modifier: Modifier,
+               enable:Boolean,
+               defaultMinYear:Int,
+               defaultMaxYear:Int,
+               minYear:Int,
+               maxYear:Int,
+               onEnableFilter: ((Boolean) -> Unit),
+               onValueChange: ((Int, Int) -> Unit)){
+
+    if(minYear != 0 && maxYear != 0 && defaultMaxYear != 0 && defaultMinYear != 0){
+        Column(modifier = modifier) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(text = stringResource(id = R.string.filter_by_year), color = Purple700, style = MaterialTheme.typography.body1)
+                Switch(checked = enable, onCheckedChange = onEnableFilter)
+            }
+
+            if(enable){
+                Column(modifier = modifier) {
+                    Text(text = "$minYear to $maxYear")
+                    RangeSlider(
+                        values = minYear.toFloat()..maxYear.toFloat(),
+                        onValueChange = { onValueChange(it.toRange().lower.toInt(), it.toRange().upper.toInt()) },
+                        valueRange = defaultMinYear.toFloat()..defaultMaxYear.toFloat())
+                }
+            }
+        }
     }
 }
