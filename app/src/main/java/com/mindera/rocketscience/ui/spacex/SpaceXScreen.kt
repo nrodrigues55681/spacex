@@ -1,32 +1,30 @@
 package com.mindera.rocketscience.ui.spacex
 
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.paging.compose.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
+import androidx.core.content.ContextCompat.startActivity
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.items
 import coil.compose.rememberImagePainter
 import com.mindera.rocketscience.R
 import com.mindera.rocketscience.data.convertToDateAndTime
@@ -34,30 +32,35 @@ import com.mindera.rocketscience.data.daysFromSince
 import com.mindera.rocketscience.domain.CompanyInfo
 import com.mindera.rocketscience.domain.Launches
 import com.mindera.rocketscience.ui.components.*
-import com.mindera.rocketscience.ui.theme.Gray
 import com.mindera.rocketscience.ui.theme.Purple700
+import com.mindera.rocketscience.ui.utils.LinksData
 import com.mindera.rocketscience.utils.Result
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.text.MessageFormat
+
 
 @Composable
 fun SpaceXScreen(viewModel: SpaceXViewModel,
-                 onShowFilterDialog: () -> Unit) {
+                 onShowFilterDialog: () -> Unit,
+                 onShowLinkDialog: (LinksData) -> Unit) {
     Scaffold(
         topBar = { TopBar(title = stringResource(id = R.string.app_name), onFilterClick = onShowFilterDialog) }
     ) {
-        SpaceXContent(viewModel = viewModel)
+        SpaceXContent(viewModel = viewModel, onShowLinkDialog = onShowLinkDialog)
     }
 }
 
 @Composable
-fun SpaceXContent(viewModel: SpaceXViewModel){
+fun SpaceXContent(viewModel: SpaceXViewModel,
+                  onShowLinkDialog: (LinksData) -> Unit){
     Column(modifier = Modifier.fillMaxSize()) {
         BarWithTitle(title = stringResource(id = R.string.company))
         Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_2half)))
         CompanyInfo(viewModel = viewModel)
         Spacer(modifier = Modifier.padding(dimensionResource(id = R.dimen.margin_2half)))
         BarWithTitle(title = stringResource(id = R.string.launches))
-        LaunchesInfo(viewModel = viewModel)
+        LaunchesInfo(viewModel = viewModel, onShowLinkDialog = onShowLinkDialog)
     }
 }
 
@@ -89,12 +92,12 @@ fun CompanyInfo(viewModel: SpaceXViewModel){
 }
 
 @Composable
-fun LaunchesInfo(viewModel: SpaceXViewModel){
+fun LaunchesInfo(viewModel: SpaceXViewModel, onShowLinkDialog: (LinksData) -> Unit){
     val lstLaunches = viewModel.lstLaunches.collectAsLazyPagingItems()
     LazyColumn {
         items(lstLaunches) { launch ->
             launch?.let {
-                LaunchItem(launch = launch)
+                LaunchItem(launch = launch, onShowLinkDialog = onShowLinkDialog)
             }
         }
 
@@ -131,10 +134,13 @@ fun LaunchesInfo(viewModel: SpaceXViewModel){
 }
 
 @Composable
-fun LaunchItem(launch: Launches){
+fun LaunchItem(launch: Launches, onShowLinkDialog: (LinksData) -> Unit){
     Column(modifier = Modifier
         .fillMaxWidth()
-        .clickable { }) {
+        .clickable { onShowLinkDialog(LinksData(
+            articleLink = URLEncoder.encode(launch.articleLink, StandardCharsets.UTF_8.toString()),
+            videoLink = URLEncoder.encode(launch.videoLink, StandardCharsets.UTF_8.toString()),
+            wikipediaLink = URLEncoder.encode(launch.wikipedia, StandardCharsets.UTF_8.toString()))) }) {
         ConstraintLayout(
             modifier = Modifier
                 .fillMaxWidth()

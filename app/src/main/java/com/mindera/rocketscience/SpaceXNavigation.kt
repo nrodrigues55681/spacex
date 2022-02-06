@@ -1,6 +1,9 @@
 package com.mindera.rocketscience
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -12,10 +15,14 @@ import com.mindera.rocketscience.ui.spacex.SpaceXScreen
 import com.mindera.rocketscience.ui.spacex.SpaceXViewModel
 import com.mindera.rocketscience.ui.spacex.dialogs.FilterDialog
 import com.mindera.rocketscience.ui.spacex.dialogs.FilterDialogViewModel
+import com.mindera.rocketscience.ui.spacex.dialogs.LinksDialog
 import com.mindera.rocketscience.ui.utils.FilterData
+import com.mindera.rocketscience.ui.utils.LinksData
+import com.mindera.rocketscience.ui.utils.fromJson
 import com.mindera.rocketscience.ui.utils.toJson
 
 const val FILTER_KEY = "filter_data"
+const val LINKS_KEY = "links_data"
 
 internal sealed class Screen(val route: String) {
     object SpaceX: Screen("spacex/{$FILTER_KEY}") {
@@ -29,11 +36,17 @@ internal sealed class Dialog(val route: String) {
         fun createRoute(filterData: FilterData)
             = "filter/${filterData.toJson()}"
     }
+
+    object Links: Dialog("links/{$LINKS_KEY}") {
+        fun createRoute(linksData: LinksData)
+                = "links/${linksData.toJson()}"
+    }
 }
 
 @Composable
 fun SpaceXNavApp() {
     val navController = rememberNavController()
+    val context = LocalContext.current
     NavHost(navController, startDestination = Screen.SpaceX.route) {
         composable(route = Screen.SpaceX.route,
             arguments = listOf(
@@ -46,6 +59,9 @@ fun SpaceXNavApp() {
             SpaceXScreen(viewModel = viewModel,
                 onShowFilterDialog = {
                     navController.navigate(Dialog.Filter.createRoute(viewModel.filterData.value))
+                },
+                onShowLinkDialog = {
+                    navController.navigate(Dialog.Links.createRoute(it))
                 })
         }
 
@@ -65,6 +81,25 @@ fun SpaceXNavApp() {
                     }
                 },
                 onCancelClick = { navController.navigateUp() })
+        }
+
+        dialog(route = Dialog.Links.route,
+            arguments = listOf(
+                navArgument(LINKS_KEY) {
+                    type = NavType.StringType
+                    defaultValue = LinksData().toJson()
+                })
+        ){ entry ->
+            entry.arguments?.getString(LINKS_KEY)?.let { linksData ->
+                LinksDialog(linksData = linksData.fromJson(),
+                    onNavigateToLink = { link ->
+                        navController.navigateUp()
+                        if(link.isNotEmpty()){
+                            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
+                            context.startActivity(browserIntent)
+                        }
+                    }, onDismissClick = { navController.navigateUp() })
+            }
         }
     }
 }

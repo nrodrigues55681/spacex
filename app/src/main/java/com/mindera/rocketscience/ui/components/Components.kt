@@ -151,26 +151,25 @@ fun OkCancelButton(modifier: Modifier,
                    onCancelClick: (() -> Unit)){
     Row(modifier = modifier,
         horizontalArrangement = Arrangement.End) {
-        Button(
-            onClick = onCancelClick,
-            shape = Shapes.large,
-            colors = ButtonDefaults.buttonColors(backgroundColor = Purple700),
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .clip(RoundedCornerShape(dimensionResource(id = R.dimen.margin_2half)))
-        ) { Text(text = cancelTitle, color = Color.White) }
+        MyButton(onClick = onCancelClick, modifier = Modifier.weight(1f), title = cancelTitle)
         Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.margin_half)))
-        Button(
-            onClick = onOkClick,
-            shape = Shapes.large,
-            colors = ButtonDefaults.buttonColors(backgroundColor = Purple700),
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
-                .clip(RoundedCornerShape(dimensionResource(id = R.dimen.margin_2half)))
-        ) { Text(text = okTitle, color = Color.White) }
+        MyButton(onClick = onOkClick, modifier = Modifier.weight(1f), title = okTitle)
     }
+}
+
+@Composable
+fun MyButton(modifier: Modifier,
+             title: String,
+             backgroundColor:Color = Purple700,
+             onClick: () -> Unit){
+    Button(
+        onClick = onClick,
+        shape = Shapes.large,
+        colors = ButtonDefaults.buttonColors(backgroundColor = backgroundColor),
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(dimensionResource(id = R.dimen.margin_2half)))
+    ) { Text(text = title, color = Color.White) }
 }
 
 @OptIn(ExperimentalMaterialApi::class)

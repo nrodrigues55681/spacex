@@ -12,10 +12,17 @@ data class FilterData(
     val maxYear: Int = 0
 )
 
-fun FilterData.toJson(): String{
+data class LinksData(
+    val articleLink: String = "",
+    val wikipediaLink: String = "",
+    val videoLink: String = "",
+)
+
+
+fun<T> T.toJson(): String{
     return Gson().toJson(this)
 }
 
-fun String.fromJson(): FilterData{
-    return Gson().fromJson(this, FilterData::class.java)
+inline fun<reified T> String.fromJson(): T{
+    return Gson().fromJson(this, T::class.java)
 }
