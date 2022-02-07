@@ -1,5 +1,6 @@
 package com.mindera.rocketscience.data.repo
 
+import androidx.annotation.VisibleForTesting
 import androidx.paging.*
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.mindera.rocketscience.data.local.SpaceXDb
@@ -67,7 +68,7 @@ class SpaceXRepo @Inject constructor(private val remoteSource: SpaceXApi, privat
         return PagingConfig(pageSize = DEFAULT_PAGE_SIZE, enablePlaceholders = false)
     }
 
-    private fun filterQuery(filterData: FilterData): SimpleSQLiteQuery{
+    fun filterQuery(filterData: FilterData): SimpleSQLiteQuery{
         var queryString = "SELECT * FROM launches"
         val launchSuccessFilterEnable = filterData.launchSuccessFilter != LaunchSuccessFilter.ALL
         if(launchSuccessFilterEnable){

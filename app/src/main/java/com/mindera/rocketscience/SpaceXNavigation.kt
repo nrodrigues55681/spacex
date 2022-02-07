@@ -1,7 +1,10 @@
 package com.mindera.rocketscience
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,6 +46,7 @@ internal sealed class Dialog(val route: String) {
     }
 }
 
+@SuppressLint("WrongConstant")
 @Composable
 fun SpaceXNavApp() {
     val navController = rememberNavController()
@@ -96,7 +100,8 @@ fun SpaceXNavApp() {
                         navController.navigateUp()
                         if(link.isNotEmpty()){
                             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(link))
-                            context.startActivity(browserIntent)
+                            val chooser = Intent.createChooser(browserIntent, "")
+                            context.startActivity(chooser)
                         }
                     }, onDismissClick = { navController.navigateUp() })
             }
